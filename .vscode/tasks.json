@@ -1,0 +1,95 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "inputs": [
+    {  
+      "id": "server",  
+      "type": "promptString", // Dropdown instead of free text  
+      "description": "Specify a server:",  
+      //"options": ["3000", "4000", "5000"], // Predefined choices  
+      "default": "localhost"  
+    },  
+    {  
+      "id": "port",  
+      "type": "promptString", // Dropdown instead of free text  
+      "description": "Specify a port:",  
+      //"options": ["3000", "4000", "5000"], // Predefined choices  
+      "default": "10001"  
+    },  
+    {  
+      "id": "user",  
+      "type": "promptString", // Dropdown instead of free text  
+      "description": "Specify a user:",  
+      //"options": ["3000", "4000", "5000"], // Predefined choices  
+      "default": "ost"  
+    },  
+    ],
+    "tasks": [
+        {
+            "label": "myecho",
+            "type": "shell",
+            "problemMatcher": [],
+            "command": "pscp",
+            "args": [
+                "-batch",
+                "-l",
+                "${input:user}",
+                "-P",
+                "${input:port}",   
+                ".vscode/setup_my_sshd.sh",
+                "${input:user}@${input:server}:/home/${input:user}/.ssh"
+            ]
+            // "command": "powershell -Command \"(Get-Content template.conf).Replace('{{MY_VAR}}', 'ActualValue') | Set-Content config.tmp; my-tool.exe --config config.tmp\"",
+            //"command": "powershell",
+            //"args": [
+            //    "-Command",
+            //    "(Get-Content -Raw -Path \".vscode/sshd_config\").Replace('SERVER_PORT', '4444') | Set-Content -Path \".vscode/sshd_config.tmp\""
+            //]
+            /*"command": "plink",
+            "args": [
+                "-batch",
+                "-l",
+                "${input:user}",
+                "-P",
+                "${input:port}",   
+                "${input:server}",
+                "pwd"
+            ]
+            */
+        },
+        {
+            "label": "myecho",
+            "type": "shell",
+            "problemMatcher": [],
+            "command": "pscp",
+            "args": [
+                "-batch",
+                "-l",
+                "${input:user}",
+                "-P",
+                "${input:port}",   
+                ".vscode/setup_my_sshd.sh",
+                "${input:user}@${input:server}:/home/${input:user}/.ssh"
+            ]
+            // "command": "powershell -Command \"(Get-Content template.conf).Replace('{{MY_VAR}}', 'ActualValue') | Set-Content config.tmp; my-tool.exe --config config.tmp\"",
+            //"command": "powershell",
+            //"args": [
+            //    "-Command",
+            //    "(Get-Content -Raw -Path \".vscode/sshd_config\").Replace('SERVER_PORT', '4444') | Set-Content -Path \".vscode/sshd_config.tmp\""
+            //]
+            /*"command": "plink",
+            "args": [
+                "-batch",
+                "-l",
+                "${input:user}",
+                "-P",
+                "${input:port}",   
+                "${input:server}",
+                "pwd"
+            ]
+            */
+        }
+
+    ]
+}
