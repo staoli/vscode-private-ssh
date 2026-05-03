@@ -70,9 +70,14 @@ if ($LASTEXITCODE -eq 0) {
     exit 1
 }
 
+
+
+Write-Host "--- Remove existing host_key from known_hosts ... ---" -ForegroundColor Cyan
+ssh-keygen -R "[$remoteUser]:${sshdPort}"
+
 Write-Host "--- Test the connection ... ---" -ForegroundColor Cyan
-# ssh -p ${sshdPort} -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -l $remoteUser $remoteHost "uname -n ; pwd"
-ssh -p ${sshdPort} -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -l $remoteUser $remoteHost "uname -n ; pwd"
+ssh -p ${sshdPort} -o "StrictHostKeyChecking=accept-new"  -l $remoteUser $remoteHost "uname -n ; pwd"
+# ssh -p ${sshdPort} -l $remoteUser $remoteHost "uname -n ; pwd"
 if ($LASTEXITCODE -eq 0) {
     Write-Host "-----------------------"
     Write-Host "RESULT: OK" -ForegroundColor Green
@@ -84,42 +89,3 @@ if ($LASTEXITCODE -eq 0) {
 }
 
 
-# --- Configuration ---
-$keyPath = "$HOME\.ssh\id_rsa"
-$remoteUser = "username"
-$remoteHost = "192.168.1.100"
-$remotePath = "/home/$remoteUser/.ssh/authorized_keys"
-
-# 1. Check if the key already exists
-if (-not (Test-Path $keyPath)) {
-    Write-Host "SSH key not found. Generating a new RSA key pair..." -ForegroundColor Cyan
-    
-    # Create .ssh directory if it doesn't exist
-    if (-not (Test-Path "$HOME\.ssh")) {
-        New-Item -ItemType Directory -Path "$HOME\.ssh" | Out-Null
-    }
-
-    # Generate key (4096 bit for security)
-    # -N '' sets an empty passphrase. Remove if you want to be prompted for one.
-    ssh-keygen -t rsa -b 4096 -f $keyPath -N "''"
-} else {
-    Write-Host "SSH key already exists at $keyPath. Skipping generation." -ForegroundColor Yellow
-}
-
-# 2. Copy the Public Key to the remote host using pscp
-Write-Host "Transferring public key to $remoteHost..." -ForegroundColor Cyan
-
-# We use the .pub file for the remote server
-$pubKeyPath = "$keyPath.pub"
-
-# Command logic:
-# -scp: forces SCP protocol
-# -pw: (Optional) You can add -pw "password" here, but it's insecure. 
-# It's better to let pscp prompt you for the password manually.
-pscp -scp $pubKeyPath "${remoteUser}@${remoteHost}:${remotePath}"
-
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "Successfully copied key to $remoteHost" -ForegroundColor Green
-} else {
-    Write-Warning "Failed to copy key. Ensure pscp is installed and the remote path exists."
-}
